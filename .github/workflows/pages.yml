@@ -36,15 +36,15 @@ jobs:
           - sitename: site2
             pathPrefix: '/vitepress-pages-demo/site2/'
     steps:
+      - uses: actions/download-artifact@v5
+        with:
+          name: docs-npm
+          path: docs/
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
           cache-dependency-path: 'docs/package-lock.json'
-      - uses: actions/download-artifact@v5
-        with:
-          name: docs-npm
-          path: docs/
       - run: npm run docs:build:${{ matrix.sitename }}
         env:
           # Env var used in `.vitepress/config.mts`
