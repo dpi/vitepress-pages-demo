@@ -1,0 +1,20 @@
+{
+  "name": "docs",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docs:dev:site1": "cd site1 && vitepress dev",
+    "docs:build:site1": "cd site1 && vitepress build",
+    "docs:preview:site1": "cd site1 && vitepress preview",
+    "docs:dev:site2": "cd site2 && vitepress dev",
+    "docs:build:site2": "cd site2 && vitepress build",
+    "docs:preview:site2": "cd site2 && vitepress preview"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "vitepress": "^1.6.3"
+  }
+}

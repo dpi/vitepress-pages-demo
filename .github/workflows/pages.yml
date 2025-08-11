@@ -1,0 +1,71 @@
+name: GH Pages
+
+# todo: Needs more Step names
+# todo: dep resolution and install before `build` job.
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - sitename: site1
+            pathPrefix: '/vitepress-pages-demo/site1/'
+          - sitename: site2
+            pathPrefix: '/vitepress-pages-demo/site2/'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: 'docs/package-lock.json'
+      # This could be in a previous job, so deps are only downloaded once.
+      - run: npm ci
+        working-directory: ./docs
+      - run: npm run docs:build:${{ matrix.sitename }}
+        env:
+          # Env var used in `.vitepress/config.mts`
+          CI_DOCS_PREFIX: ${{ matrix.pathPrefix }}
+        working-directory: ./docs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: docs-dist-${{ matrix.sitename }}
+          path: docs/${{ matrix.sitename }}/.vitepress/dist/
+          retention-days: 1
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v5
+        with:
+          path: built-docs
+          pattern: docs-dist-*
+
+      - name: Rename artifact directories to remove the artifact prefix
+        run: |
+          cd built-docs
+          for dir in docs-dist-*; do
+            mv "$dir" "${dir#docs-dist-}"
+          done
+
+      - name: Upload combined site artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./built-docs
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
