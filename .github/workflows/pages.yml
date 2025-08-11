@@ -21,8 +21,10 @@ jobs:
         working-directory: ./docs
       - uses: actions/upload-artifact@v4
         with:
-          name: docs
-          path: docs/
+          name: docs-npm
+          path: |
+            docs/
+            !docs/node_modules/.cache
           retention-days: 1
 
   build:
@@ -38,7 +40,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v5
         with:
-          name: docs
+          name: docs-npm
           path: docs/
       - uses: actions/setup-node@v4
         with:
